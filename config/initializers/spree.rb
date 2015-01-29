@@ -6,6 +6,17 @@
 # In order to initialize a setting do:
 # config.setting_name = 'new value'
 Spree.config do |config|
+	  Paperclip::Attachment.default_options[:s3_protocol] = "https"
+Spree::Image.attachment_definitions[:attachment][:styles] = ActiveSupport::JSON.decode('{"mini":"48x48\u003E","small":"175x175\u003E","product":"240x240\u003E","large":"600x600\u003E"}').symbolize_keys!
+Spree::Image.attachment_definitions[:attachment][:path] = " /#{Rails.env}/:id/:style/:basename.:extension"
+Spree::Image.attachment_definitions[:attachment][:url] = '/spree/products/:id/:style/:basename.:extension'
+Spree::Image.attachment_definitions[:attachment][:default_url] = ''
+Spree::Image.attachment_definitions[:attachment][:default_style] = 'product'
+
+end
+
+  Paperclip.interpolates(:s3_eu_url) do |attachment, style|
+  "#{attachment.s3_protocol}://#{Spree::Config[:s3_host_alias]}/#{attachment.bucket_name}/#{attachment.path(style).gsub(%r{^/}, "")}"
   # Example:
   # Uncomment to stop tracking inventory levels in the application
   # config.track_inventory_levels = false
